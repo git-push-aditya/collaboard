@@ -1,0 +1,1 @@
+{"root":["./src/index.ts","./src/controllers/authController.ts","./src/controllers/roomController.ts","./src/middlewares/zodCheck.ts","./src/routes/authRoutes.ts","./src/routes/roomRoutes.ts"],"version":"5.8.2"}
