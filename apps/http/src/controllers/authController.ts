@@ -1,108 +1,143 @@
 import { Request, Response } from "express";
 import { authZod } from "@repo/common/authzod";
+import { prismaClient } from "@repo/db/prismaClient"
+import bcrypt from "bcrypt"
+import { generateToken } from "@repo/backend-common/JWTHandler"
 
-export const signUp = ({req,res}:{req : Request,res : Response}) => {
-    try{ 
+
+export const signUp = async (req: Request, res: Response) => {
+    try {
         const typeCheck = authZod.safeParse(req.body);
-        if(!typeCheck.success){
+        if (!typeCheck.success) {
             res.status(404).json({
-                status : "failure",
-                payload : {
+                status: "failure",
+                payload: {
                     message: "Invalid type of data passed"
                 }
             })
             return;
         }
 
-        const {userName, passwrod} = req.body;
+        const { userName, passwrod } = req.body;
 
-        //db call to check fi exist
-        //@ts-ignore 
-        const ifExist;
-
-        if(ifExist){
+        const ifExist = await prismaClient.user.findFirst({
+            where: {
+                userName: userName
+            }, select: {
+                userName: true
+            }
+        })
+        if (ifExist) {
             res.status(400).json({
-                status : "failure",
-                payload:{
-                    message : "username already in use"
+                status: "failure",
+                payload: {
+                    message: "username already in use"
                 }
             })
             return;
-        }else{
-            //db call to add user to data base
-            //package call to create jwt payload
-            //@ts-ignore
-            const token = "hola";
+        } else {
+            const hashedPassword = await bcrypt.hash(passwrod.trim(), 10);
+
+            const newUser = await prismaClient.user.create({
+                data: {
+                    userName: userName,
+                    passwrod: hashedPassword
+                }, select: {
+                    userName: true,
+                    id: true
+                }
+            })
+
+
+            const token = generateToken({ userId: newUser.id });
+
             res.status(200).json({
-                status : "success",
-                payload :{
-                    "message" : "user created successfully",
-                    "token" : token 
+                status: "success",
+                payload: {
+                    "message": "user created successfully",
+                    "token": token
                 }
             })
             return;
         }
 
-    }catch(e){
+    } catch (e) {
         console.error("Error occured in signin controller\n")
         console.error(e);
         res.status(400).json({
-            status : "failure",
-            payload :{
-                "message" : "server issue"
+            status: "failure",
+            payload: {
+                "message": "server issue"
             }
         })
     }
 }
 
-export const signIn = ({req,res} : {req : Request,res : Response}) => {
-    try{
+
+export const signIn = async (req: Request, res: Response) => {
+    try {
         const typeCheck = authZod.safeParse(req.body);
-        if(!typeCheck.success){
+        if (!typeCheck.success) {
             res.status(404).json({
-                status : "failure",
-                payload : {
+                status: "failure",
+                payload: {
                     message: "Invalid type of data passed"
                 }
             })
             return;
         }
-        const {userName, passwrod} = req.body; 
+        const { userName, passwrod } = req.body;
 
-        
-        //db call to check fi exist
-        //@ts-ignore 
-        const ifExist;
 
-        if(!ifExist){
+        const ifExist = await prismaClient.user.findFirst({
+            where: {
+                userName: userName
+            }, select: {
+                passwrod: true,
+                id: true
+            }
+        })
+
+        if (!ifExist) {
             res.status(400).json({
-                status : "failure",
-                payload:{
-                    message : "username doesnt exist"
+                status: "failure",
+                payload: {
+                    message: "username doesnt exist"
                 }
             })
             return;
-        }else{ 
-            //package call to create jwt payload
-            //@ts-ignore
-            const token = "hola";
-            res.status(200).json({
-                status : "success",
-                payload :{
-                    "message" : "signed in successfully",
-                    "token" : token 
-                }
-            })
+        } else {
+            const verify = await bcrypt.compare(passwrod.trim(), ifExist.passwrod);
+
+            if (verify) {
+                const token = generateToken({ userId: ifExist.id });
+                res.status(200).json({
+                    status: "success",
+                    payload: {
+                        "message": "signed in successfully",
+                        "token": token
+                    }
+                })
+
+            } else {
+                res.status(400).json({
+                    status: "failure",
+                    payload: {
+                        message: "Wrong password or username"
+                    }
+                })
+            }
             return;
+
         }
 
-    }catch(e){
+    } catch (e) {
         console.error("Error occured in signin controller\n")
         console.error(e);
         res.status(400).json({
-            status : "failure",
-            payload :{
-                "message" : "server issue"
+            status: "failure",
+            payload: {
+                "message": "server issue"
             }
         })
     }

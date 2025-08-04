@@ -13,3 +13,8 @@ export const joinRoomZod = z.object({
     password: z.string().min(5).max(20)
 })
 
+
+export const addMessageZod = z.object({
+    roomId: z.number(),
+    message : z.string()
+})

@@ -4,17 +4,21 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
-  },"exports" :{
-    "./config" : "./src/config.ts"
+  },
+  "exports": {
+    "./config": "./src/config.ts",
+    "./JWTHandler" : "./src/jwtHandler.ts"
   },
   "devDependencies": {
-    "@repo/typescript-config": "workspace:*"
+    "@repo/typescript-config": "workspace:*",
+    "@types/jsonwebtoken": "^9.0.10"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@types/node": "^22.15.3"
+    "@types/node": "^22.15.3",
+    "jsonwebtoken": "^9.0.2"
   }
 }

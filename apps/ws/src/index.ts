@@ -1,37 +1,19 @@
 import { WebSocketServer } from "ws";
-import jwt, { JwtPayload } from "jsonwebtoken";
-import  { JWT_SECRET } from "@repo/backend-common/config";
+import { verifyJwt } from "@repo/backend-common/JWTHandler"
+
 
 const wss = new WebSocketServer({ port: 8080 });
 
 
-const checkUser = (token: string): string | null => {
-    try {
-
-        const decoded = jwt.verify(token, JWT_SECRET);
-
-        if (typeof decoded == "string") {
-            return null;
-        }
-
-        if (!decoded || !decoded.userId) {
-            return null;
-        }
-
-        return decoded.userId;
-
-    } catch (e) {
-        return null;
-    } 
-
+const checkUser = (token: string): number | null => { 
+    return verifyJwt({token}); 
 }
 
 
 
 
 
-wss.on('connection', (socket, Request) => {
-    console.log("connection established"); 
+wss.on('connection', (socket, Request) => { 
 
     const url = Request.url;
     if (!url) return;
