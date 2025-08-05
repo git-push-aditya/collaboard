@@ -8,7 +8,9 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-app.use('./auth',authRoutes);
-app.use('./room',roomRoutes);
+app.use('/auth', authRoutes);
+app.use('/room', roomRoutes);
 
-app.listen("3001");
+app.listen(3001,() => {
+    console.log("port started at 3001")
+});

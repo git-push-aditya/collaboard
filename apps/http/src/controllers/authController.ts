@@ -41,7 +41,7 @@ export const signUp = async (req: Request, res: Response) => {
             const newUser = await prismaClient.user.create({
                 data: {
                     userName: userName,
-                    passwrod: hashedPassword
+                    password: hashedPassword
                 }, select: {
                     userName: true,
                     id: true
@@ -54,8 +54,8 @@ export const signUp = async (req: Request, res: Response) => {
             res.status(200).json({
                 status: "success",
                 payload: {
-                    "message": "user created successfully",
-                    "token": token
+                    message: "user created successfully",
+                    token
                 }
             })
             return;
@@ -93,7 +93,7 @@ export const signIn = async (req: Request, res: Response) => {
             where: {
                 userName: userName
             }, select: {
-                passwrod: true,
+                password: true,
                 id: true
             }
         })
@@ -107,7 +107,7 @@ export const signIn = async (req: Request, res: Response) => {
             })
             return;
         } else {
-            const verify = await bcrypt.compare(passwrod.trim(), ifExist.passwrod);
+            const verify = await bcrypt.compare(passwrod.trim(), ifExist.password);
 
             if (verify) {
                 const token = generateToken({ userId: ifExist.id });

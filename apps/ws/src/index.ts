@@ -10,9 +10,6 @@ const checkUser = (token: string): number | null => {
 }
 
 
-
-
-
 wss.on('connection', (socket, Request) => { 
 
     const url = Request.url;

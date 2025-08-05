@@ -50,13 +50,8 @@ export const createRoom = async (req: Request, res: Response) => {
                     totalCapacity : true,
                     id : true,
                     admin : {
-                        select :{
-                            user : {
-                                select :{
-                                    userName : true
-                                }
-                            }
-                            
+                        select :{  
+                            userName : true                             
                         }
                     }
                 }
@@ -69,7 +64,7 @@ export const createRoom = async (req: Request, res: Response) => {
                     roomId : newRoom.id,
                     roomName: newRoom.slug,
                     roomPass: newRoom.password,
-                    roomCapacity: newRoom.totlaCapacity,
+                    roomCapacity: newRoom.totalCapacity,
                     owner: newRoom.admin.userName
                 }
             })
@@ -259,24 +254,14 @@ export const allMembers = async (req:Request, res : Response) => {
             },select : {
                 admin : {
                     select : {
-                        user : {
-                            select :{
-                                userName : true
-                            }
-                        }
+                        userName : true                            
                     }
                 } ,member : {
-                    select : {
-                        roomsMember : {
-                            select : {
-                                member :{
-                                    select : {
-                                        user :{
-                                            userName : true
-                                        }
-                                    }
-                                }
-                            }
+                    select : { 
+                        member :{
+                            select : { 
+                                userName : true
+                            }  
                         }
                     }
                 }
@@ -359,12 +344,8 @@ export const allChats = async (req: Request, res : Response) => {
                 senderId : true,
                 id : true,
                 sender : {
-                    select : {
-                        user : {
-                            select : {
-                                userName : true
-                            }
-                        }
+                    select : {  
+                        userName : true 
                     }
                 }
             }
